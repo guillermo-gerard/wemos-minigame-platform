@@ -62,6 +62,7 @@ public:
     bool RunFrame() override;
     void EndGameAnimation(void) override;
     void CountBackwardsAndStart(int) override;
+    char* GetName() override;
 
 private:
     void DrawFrame();

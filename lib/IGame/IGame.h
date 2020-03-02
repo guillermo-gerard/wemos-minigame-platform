@@ -17,7 +17,8 @@ public:
     virtual void EndGameAnimation(void) = 0;
     //Maybe this can be moved to a Base class, I don't see any reason for this to be different for each game
     virtual void CountBackwardsAndStart(int) = 0;
-
+    //Returns the name of the game (for menu)
+    virtual char *GetName() = 0;
 private:
 };
 

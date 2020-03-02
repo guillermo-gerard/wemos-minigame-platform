@@ -21,10 +21,17 @@ const int screenWidth = 128;
 const int screenHeight = 64;
 
 PongGame Pong(screenWidth, screenHeight, highScoreMemPosGame0, &Display, 
-              startButton, leftButton, rightButton);
+startButton, leftButton, rightButton);
+
+PongGame Pong2(screenWidth, screenHeight, highScoreMemPosGame0, &Display, 
+startButton, leftButton, rightButton);
+
+IGame* games[] = {&Pong, &Pong2};
+int gameCount = 2;
 
 //TODO: Replace the following with menu selector
-IGame* CurrentGame = &Pong;
+//IGame* CurrentGame = &Pong;
+int selectedGameIndex = 0;
 
 unsigned long inactivityCounterStartMillis;
 unsigned const long inactiviySecondsBeforeGoingToBed = 10;
@@ -32,13 +39,14 @@ bool isGameLost = false;
 
 enum class GameStatus
 {
+  STATUS_MENU,
   STATUS_WELCOME,
   STATUS_WAITING,
   STATUS_PLAYING,
   STATUS_LOST
 };
 
-GameStatus STATUS_CURRENT = GameStatus::STATUS_WAITING;
+GameStatus STATUS_CURRENT = GameStatus::STATUS_MENU;
 
 #ifdef DEBUG
   void LogDebug(String text){
@@ -50,6 +58,7 @@ void LogDebug(String text){;}
 #endif
 
 void WaitForStart();
+void RunMenu();
 
 void setup()
 {
@@ -76,23 +85,26 @@ void setup()
   Display.enableUTF8Print();
 
   inactivityCounterStartMillis = millis();
-  CurrentGame->WelcomeScreen();
+  games[selectedGameIndex]->WelcomeScreen();
 }
 
 void loop()
 {
   switch (STATUS_CURRENT){
+    case GameStatus::STATUS_MENU:
+      RunMenu();
+      return;
     case GameStatus::STATUS_WAITING:
       WaitForStart();
       return;
     case GameStatus::STATUS_PLAYING:
-      isGameLost = CurrentGame->.RunFrame();
+      isGameLost = games[selectedGameIndex]->RunFrame();
       if(isGameLost){
         STATUS_CURRENT = GameStatus::STATUS_LOST;
       }
       return;
     case GameStatus::STATUS_LOST:
-      CurrentGame->EndGameAnimation();
+      games[selectedGameIndex]->EndGameAnimation();
       isGameLost = false;
       STATUS_CURRENT = GameStatus::STATUS_WAITING;
       inactivityCounterStartMillis = millis();
@@ -102,11 +114,43 @@ void loop()
   }
 }
 
+void RunMenu(){
+
+  Display.firstPage();
+  do
+  {
+    Display.setCursor(1, 32);
+    Display.setFont(u8g2_font_fub14_tr);
+    Display.print(games[selectedGameIndex]->GetName());
+    
+    if (selectedGameIndex > 0)
+    {
+      Display.setCursor(1, 60);
+      Display.print("<");
+    }
+
+    if(selectedGameIndex < gameCount-1){
+      Display.setCursor(110, 60);
+      Display.print(">");
+    }
+  } while (Display.nextPage());
+
+  if(selectedGameIndex > 0 && !digitalRead(leftButton)){
+    selectedGameIndex--;
+  }
+  if(selectedGameIndex < gameCount-1 && !digitalRead(rightButton)){
+    selectedGameIndex++;
+  }
+  if(!digitalRead(startButton)){
+    STATUS_CURRENT = GameStatus::STATUS_WAITING;
+  }
+}
+
 void WaitForStart()
 {
   if (!digitalRead(startButton))
   {
-    CurrentGame->CountBackwardsAndStart(3);
+    games[selectedGameIndex]->CountBackwardsAndStart(3);
     STATUS_CURRENT = GameStatus::STATUS_PLAYING;
     return;
   }

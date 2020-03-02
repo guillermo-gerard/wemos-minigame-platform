@@ -215,3 +215,5 @@ int PongGame::CalculateBallY(unsigned long delta)
     }
     return ballY;
 }
+
+char *PongGame::GetName() { return (char *)"Pong"; }
