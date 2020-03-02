@@ -3,6 +3,7 @@
 #include <U8g2lib.h>
 
 #include <PongGame.h>
+#include <JuegoTest.h>
 
 #define DEBUG
 
@@ -23,18 +24,19 @@ const int screenHeight = 64;
 PongGame Pong(screenWidth, screenHeight, highScoreMemPosGame0, &Display, 
 startButton, leftButton, rightButton);
 
+// JuegoTest Test(screenWidth, screenHeight, highScoreMemPosGame1, &Display, 
+// startButton, leftButton, rightButton);
+
 PongGame Pong2(screenWidth, screenHeight, highScoreMemPosGame0, &Display, 
 startButton, leftButton, rightButton);
 
 IGame* games[] = {&Pong, &Pong2};
 int gameCount = 2;
 
-//TODO: Replace the following with menu selector
-//IGame* CurrentGame = &Pong;
 int selectedGameIndex = 0;
 
 unsigned long inactivityCounterStartMillis;
-unsigned const long inactiviySecondsBeforeGoingToBed = 10;
+unsigned const long inactiviySecondsBeforeGoingToBed = 100;
 bool isGameLost = false;
 
 enum class GameStatus
@@ -71,8 +73,9 @@ void setup()
     // delay(1);
   
   #ifdef DEBUG
-  Serial.begin(115200);
+  Serial.begin(9600);
   #endif
+  Serial.println("starting");
 
   EEPROM.begin(16);
 
