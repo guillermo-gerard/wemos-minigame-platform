@@ -24,14 +24,15 @@ const int screenHeight = 64;
 PongGame Pong(screenWidth, screenHeight, highScoreMemPosGame0, &Display, 
 startButton, leftButton, rightButton);
 
-// JuegoTest Test(screenWidth, screenHeight, highScoreMemPosGame1, &Display, 
-// startButton, leftButton, rightButton);
+JuegoTest Test(screenWidth, screenHeight, highScoreMemPosGame1, &Display, 
+startButton, leftButton, rightButton);
 
 PongGame Pong2(screenWidth, screenHeight, highScoreMemPosGame0, &Display, 
 startButton, leftButton, rightButton);
 
-IGame* games[] = {&Pong, &Pong2};
-int gameCount = 2;
+
+IGame* games[] = {&Pong, &Test, &Pong2};
+int gameCount = 3;
 
 int selectedGameIndex = 0;
 
@@ -49,6 +50,9 @@ enum class GameStatus
 };
 
 GameStatus STATUS_CURRENT = GameStatus::STATUS_MENU;
+
+unsigned long startDebounce = 0;
+unsigned const int debounceTime = 500;
 
 #ifdef DEBUG
   void LogDebug(String text){
@@ -117,6 +121,7 @@ void loop()
   }
 }
 
+
 void RunMenu(){
 
   Display.firstPage();
@@ -141,7 +146,13 @@ void RunMenu(){
   if(selectedGameIndex > 0 && !digitalRead(leftButton)){
     selectedGameIndex--;
   }
+ 
+  if(millis() - debounceTime < startDebounce){
+    return;
+  }
+ 
   if(selectedGameIndex < gameCount-1 && !digitalRead(rightButton)){
+    startDebounce = millis();
     selectedGameIndex++;
   }
   if(!digitalRead(startButton)){

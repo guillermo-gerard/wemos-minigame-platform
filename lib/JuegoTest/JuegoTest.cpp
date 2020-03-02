@@ -21,7 +21,7 @@ void JuegoTest::WelcomeScreen()
     do
     {
         Display->setCursor(4, 22);
-        Display->setFont(u8g2_font_fub20_tr);
+        Display->setFont(u8g2_font_8x13B_mr);
         Display->print("Juego test");
         Display->setFont(u8g2_font_4x6_mf);
         Display->drawStr(10, 45, "Press start button to begin");
@@ -72,11 +72,6 @@ void JuegoTest::EndGameAnimation()
         Display->setCursor(1, 32);
         Display->setFont(u8g2_font_fub14_tr);
         Display->print("GAME OVER");
-        if (score > highScore)
-        {
-            Display->setFont(u8g2_font_4x6_mf);
-            Display->drawStr(27, 60, "New high score!!");
-        }
     } while (Display->nextPage());
 
     if (score > highScore)
@@ -93,21 +88,18 @@ void JuegoTest::EndGameAnimation()
 
 bool JuegoTest::RunFrame()
 {
-    unsigned long currentMillis = millis();
- //   unsigned long delta = currentMillis - lastFrameMillis;
+    Display->setFont(u8g2_font_8x13B_mr);
+    Display->firstPage();
+    do
+    {
+        Display->drawStr(1, 6, (String("Score: ") + String(score)).c_str());
+        Display->drawStr(90, 6, (String("High: ") + String(highScore)).c_str());
+        Display->drawStr(10, 60, "Jugando");
 
-Display->firstPage();
-do
-{
-    Display->drawStr(1, 6, (String("Score: ") + String(score)).c_str());
-    Display->drawStr(90, 6, (String("High: ") + String(highScore)).c_str());
-    Display->drawStr(10, 60, "Jugando");
+    } while (Display->nextPage());
 
-} while (Display->nextPage());
-
-  delay(3000);
+    delay(3000);
     return true;
 }
-
 
 char *JuegoTest::GetName() { return (char *)"Test"; }
